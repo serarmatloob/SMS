@@ -14,42 +14,27 @@
         <EditText
             android:id="@+id/messageEditText"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_margin="16dp"
-            android:autofillHints="Hi"
-            android:ems="10"
-            android:gravity="top"
-            android:hint="@string/message"
-            android:inputType="text"
-            app:layout_constraintBottom_toTopOf="@+id/phoneEditText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <EditText
-            android:id="@+id/phoneEditText"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:autofillHints="123"
             android:ems="10"
-            android:hint="@string/phone_number"
-            android:inputType="phone"
-            app:layout_constraintBottom_toTopOf="@+id/sendMessageButton"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:autofillHints="Hi"
+            android:hint="@string/message"
+            android:inputType="text"
+            app:layout_constraintEnd_toStartOf="@+id/sendMessageButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/messageEditText" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-        <Button
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/sendMessageButton"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:onClick="sendMessage"
+            app:fabSize="mini"
+            android:src="@drawable/ic_baseline_send_24"
             android:text="@string/send_message"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
