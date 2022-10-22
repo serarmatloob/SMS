@@ -11,7 +11,17 @@ class ChatRoomAdapter(private val context: Context, private val chatList: ArrayL
     RecyclerView.Adapter<ChatRoomAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.row_chat, parent, false)
+        var view: View? = null
+
+        when(viewType) {
+            0 -> {
+                view = LayoutInflater.from(context).inflate(R.layout.row_chat_user, parent, false)
+            }
+
+            1 -> {
+                view = LayoutInflater.from(context).inflate(R.layout.row_chat_partner, parent, false)
+            }
+        }
         return ViewHolder(view!!)
     }
 
