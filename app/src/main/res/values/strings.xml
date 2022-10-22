@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">SMS</string>
+    <string name="app_name">ChatRoom</string>
     <string name="message">Message</string>
     <string name="phone_number">Phone number</string>
     <string name="send_message">Send message</string>
+    <string name="send_message_button">Send message button</string>
+    <string name="name">Name</string>
 </resources>

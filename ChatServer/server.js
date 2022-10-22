@@ -23,8 +23,8 @@ socketIO.on('connection',function(socket) {
 
     var userName = '';
     
-    socket.on('subscribe', function(data) {
-        console.log('subscribe invoked')
+    socket.on('SUBSCRIBE', function(data) {
+        console.log('SUBSCRIBE invoked')
         const room_data = JSON.parse(data)
         userName = room_data.userName;
         const roomName = room_data.roomName;
@@ -35,8 +35,8 @@ socketIO.on('connection',function(socket) {
         socketIO.to(`${roomName}`).emit('newUserToChatRoom',userName);
     })
 
-    socket.on('unsubscribe',function(data) {
-        console.log('unsubscribe invoked')
+    socket.on('UNSUBSCRIBE',function(data) {
+        console.log('UNSUBSCRIBE invoked')
         const room_data = JSON.parse(data)
         const userName = room_data.userName;
         const roomName = room_data.roomName;
@@ -46,8 +46,8 @@ socketIO.on('connection',function(socket) {
         socket.leave(`${roomName}`)
     })
 
-    socket.on('newMessage',function(data) {
-        console.log('newMessage invoked')
+    socket.on('NEW_MESSAGE',function(data) {
+        console.log('NEW_MESSAGE invoked')
 
         const messageData = JSON.parse(data)
         const messageContent = messageData.messageContent
@@ -60,7 +60,7 @@ socketIO.on('connection',function(socket) {
             messageContent : messageContent,
             roomName : roomName
         }
-        socket.broadcast.to(`${roomName}`).emit('updateChat',JSON.stringify(chatData))
+        socket.broadcast.to(`${roomName}`).emit('UPDATE_CHAT',JSON.stringify(chatData))
     })
 
     socket.on('disconnect', function () {
