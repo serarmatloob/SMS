@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var chatRoomAdapter: ChatRoomAdapter
     private lateinit var username: String
-    private lateinit var mSocket: Socket
+    private lateinit var serverAddress: String
+    private var mSocket: Socket? = null
 
     private val gson: Gson = Gson()
     private val chatList: ArrayList<Message> = arrayListOf();
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         username = intent.extras?.getString(USERNAME)!!
+        serverAddress = intent.extras?.getString(SERVER_ADDRESS)!!
 
         recyclerView = findViewById(R.id.recyclerView)
 
@@ -44,16 +46,20 @@ class MainActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                mSocket = IO.socket(SOCKET_URI)
-                mSocket.connect()
-                mSocket.on(Socket.EVENT_CONNECT, onConnect)
-                mSocket.on(EventType.UPDATE_CHAT.toString(), onUpdateChat)
+                val socketUri = replaceURl(serverAddress)
+                Log.d(TAG, "Connecting to $socketUri")
+                mSocket = IO.socket(socketUri)
+                mSocket?.connect()
+                mSocket?.on(Socket.EVENT_CONNECT, onConnect)
+                mSocket?.on(EventType.UPDATE_CHAT.toString(), onUpdateChat)
             } catch (e: Exception) {
                 e.printStackTrace()
                 Log.d(TAG, "Failed to connect $e")
             }
         }
     }
+
+    private fun replaceURl(ip: String) = "http://$ip:3000"
 
     var onUpdateChat = Emitter.Listener {
         val chat: Message = gson.fromJson(it[0].toString(), Message::class.java)
@@ -62,10 +68,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var onConnect = Emitter.Listener {
-        Log.d(TAG, "ID: " + mSocket.id())
+        Log.d(TAG, "ID: " + mSocket?.id())
         val data = InitialData(username, ROOM_NAME)
         val jsonData = gson.toJson(data)
-        mSocket.emit(EventType.SUBSCRIBE.toString(), jsonData)
+        mSocket?.emit(EventType.SUBSCRIBE.toString(), jsonData)
         connected()
     }
 
@@ -84,16 +90,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun sendMessage(view: View) {
-        when (view.id) {
-            R.id.sendMessageButton -> {
-                val messageEditText = findViewById<EditText>(R.id.messageEditText)
-                val content = messageEditText.text.toString()
-                messageEditText.text.clear()
-                val message = Message(username, content, ROOM_NAME, MessageType.CHAT_MINE.index)
-                val jsonData = gson.toJson(message)
-                mSocket.emit(EventType.NEW_MESSAGE.toString(), jsonData)
+        if (mSocket != null) {
+            when (view.id) {
+                R.id.sendMessageButton -> {
+                    val messageEditText = findViewById<EditText>(R.id.messageEditText)
+                    val content = messageEditText.text.toString()
+                    messageEditText.text.clear()
+                    val message = Message(username, content, ROOM_NAME, MessageType.CHAT_MINE.index)
+                    val jsonData = gson.toJson(message)
+                    mSocket?.emit(EventType.NEW_MESSAGE.toString(), jsonData)
 
-                addItemToRecyclerView(message)
+                    addItemToRecyclerView(message)
+                }
             }
         }
     }
@@ -102,7 +110,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         val data = InitialData(username, ROOM_NAME)
         val jsonData = gson.toJson(data)
-        mSocket.emit(EventType.UNSUBSCRIBE.toString(), jsonData)
-        mSocket.disconnect()
+        mSocket?.emit(EventType.UNSUBSCRIBE.toString(), jsonData)
+        mSocket?.disconnect()
     }
 }
