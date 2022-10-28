@@ -2,7 +2,7 @@ package com.matloob.sms
 
 data class Message(
     val userName: String,
-    val messageContent: String,
+    var messageContent: String,
     val roomName: String,
     var viewType: Int
 )

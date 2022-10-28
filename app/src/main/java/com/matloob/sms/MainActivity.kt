@@ -27,7 +27,9 @@ class MainActivity : AppCompatActivity() {
     private var mSocket: Socket? = null
 
     private val gson: Gson = Gson()
-    private val chatList: ArrayList<Message> = arrayListOf();
+    private val chatList: ArrayList<Message> = arrayListOf()
+
+    private val cryptoClass = CryptoClass()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,9 +63,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun replaceURl(ip: String) = "http://$ip:3000"
 
-    var onUpdateChat = Emitter.Listener {
-        val chat: Message = gson.fromJson(it[0].toString(), Message::class.java)
+    private var onUpdateChat = Emitter.Listener {
+        Log.d(TAG, "on update chat: ")
+        val message = it[0].toString()
+        val chat: Message = gson.fromJson(message, Message::class.java)
         chat.viewType = MessageType.CHAT_PARTNER.index
+        chat.messageContent = cryptoClass.decryptMessage(chat.messageContent)
         addItemToRecyclerView(chat)
     }
 
@@ -94,12 +99,13 @@ class MainActivity : AppCompatActivity() {
             when (view.id) {
                 R.id.sendMessageButton -> {
                     val messageEditText = findViewById<EditText>(R.id.messageEditText)
-                    val content = messageEditText.text.toString()
+                    var content = messageEditText.text.toString()
                     messageEditText.text.clear()
+                    content = cryptoClass.encryptMessage(content)
                     val message = Message(username, content, ROOM_NAME, MessageType.CHAT_MINE.index)
                     val jsonData = gson.toJson(message)
                     mSocket?.emit(EventType.NEW_MESSAGE.toString(), jsonData)
-
+                    message.messageContent = cryptoClass.decryptMessage(message.messageContent)
                     addItemToRecyclerView(message)
                 }
             }
